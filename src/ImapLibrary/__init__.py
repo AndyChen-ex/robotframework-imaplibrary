@@ -284,9 +284,12 @@ class ImapLibrary(object):
         is_secure = kwargs.pop('is_secure', 'True') == 'True'
         port = int(kwargs.pop('port', self.PORT_SECURE if is_secure else self.PORT))
         folder = '"%s"' % str(kwargs.pop('folder', self.FOLDER))
+        read_only = kwargs.pop('read_only', 'True') == 'True'
+
+
         self._imap = IMAP4_SSL(host, port) if is_secure else IMAP4(host, port)
         self._imap.login(kwargs.pop('user', None), kwargs.pop('password', None))
-        self._imap.select(folder)
+        self._imap.select(folder=folder, readonly=True) if read_only else self._imap.select(folder=folder)
         self._init_multipart_walk()
 
     def wait_for_email(self, **kwargs):
